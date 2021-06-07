@@ -1,0 +1,64 @@
+{% include 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+     <h1> Notes </h1>
+    <form method="POST" id="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="item">
+                Item
+            </label>
+            <select class="form-control" id="item">
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+              </select>
+        </div>
+
+        <div class="form-group">
+            <label for="basePrice">Base Price</label>
+            <input type="number" class="form-control" id="basePrice">
+        </div>
+        <div class="form-group">
+            <label for="discount">Discount</label>
+            <input type="number" class="form-control" id="discount">
+        </div>
+        <button type="submit">Submit </button>
+    </form>
+    <p id="item2"></p>
+    <p id="basePrice2"></p>
+    <p id="finalPrice2"></p>
+</div>
+<!-- Adding axios script tag  here-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    let form = document.getElementById('form'); // selecting the form
+    
+    form.addEventListener('submit', function(event) { // 1
+        event.preventDefault()
+        
+        let data = new FormData(); // 2
+        let item = document.getElementById('item').value
+        data.append("item", document.getElementById('item').value)  
+        data.append("basePrice", document.getElementById('basePrice').value)
+        data.append("discount", document.getElementById('discount').value||0)
+        data.append("csrfmiddlewaretoken", '{{csrf_token}}') // 3
+        
+        axios.post('createnote/', data) // 4
+         .then(res => {
+            var element = document.getElementById("item2");
+            element.innerHTML = `Item = ${item}`;
+            var element2 = document.getElementById("basePrice2");
+            element2.innerHTML = `Base Price = ${res.data.basePrice}`;
+            var element3 = document.getElementById("finalPrice2");
+            element3.innerHTML = `Final Price = ${res.data.finalPrice}`;
+              
+         }) 
+         .catch(errors => console.log(errors)) // 6
+    
+    })
+    
+    </script>
+{% endblock %}
